@@ -3,11 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Create Webcam Session</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #result { margin-top: 20px; }
-    button { padding: 10px 20px; font-size: 16px; }
-  </style>
 </head>
 <body>
   <h1>Create Webcam Session</h1>
@@ -15,20 +10,13 @@
   <div id="result"></div>
 
   <script>
-    const apicreate = '/api/create';
-
     document.getElementById('generate').onclick = async () => {
-      try {
-        let res = await fetch(apicreate);
-        if (!res.ok) throw new Error('API request failed');
-        let data = await res.json();
-        document.getElementById('result').innerHTML = `
-          <strong>Session ID:</strong> ${data.id}<br>
-          <strong>Link:</strong> <a href="${data.link}" target="_blank">${data.link}</a>
-        `;
-      } catch (err) {
-        document.getElementById('result').innerHTML = `Error: ${err.message}`;
-      }
+      const res = await fetch('/api/create');
+      const data = await res.json();
+      document.getElementById('result').innerHTML = `
+        <strong>Session ID:</strong> ${data.id}<br>
+        <strong>Link:</strong> <a href="${data.link}" target="_blank">${data.link}</a>
+      `;
     };
   </script>
 </body>
