@@ -1,51 +1,24 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const fs = require("fs");
-const path = require("path");
-const { telegramChatId, captureInterval } = require("./config");
-const bot = require("./telegram_handler");
+const express = require('express');
+const path = require('path');
+
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(bodyParser.json({ limit: "10mb" }));
-app.use(express.static("public"));
+// Serve static files (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, '/public')));
 
-// Load sessions database
-let sessions = {};
-const dbFile = "./database/sessions.json";
-
-if (fs.existsSync(dbFile)) {
-  sessions = JSON.parse(fs.readFileSync(dbFile));
-}
-
-// --------------------------------------
-// Create new session (generate link)
-// --------------------------------------
-app.get("/api/create", (req, res) => {
-  const id = Math.random().toString(36).substring(2, 10);
-  sessions[id] = { created: Date.now(), active: true };
-
-  fs.writeFileSync(dbFile, JSON.stringify(sessions));
-
-  const link = `https://yourdomain.com/capture.html?id=${id}`;
-  res.json({ id, link });
+// API endpoint to create a new webcam session
+app.get('/api/create', (req, res) => {
+  const sessionId = Date.now(); // unique session ID
+  const link = `${req.protocol}://${req.get('host')}/live/${sessionId}`;
+  res.json({ id: sessionId, link: link });
 });
 
-// --------------------------------------
-// Receive captured image
-// --------------------------------------
-app.post("/api/capture", async (req, res) => {
-  const { id, image } = req.body;
-
-  if (!sessions[id]) return res.json({ error: "Invalid session" });
-
-  const base64 = image.replace(/^data:image\/jpeg;base64,/, "");
-  const buffer = Buffer.from(base64, "base64");
-
-  await bot.sendPhoto(telegramChatId, buffer, {
-    caption: `📸 New image from session ${id}`
-  });
-
-  res.json({ status: "ok" });
+// Optional: serve live session page
+app.get('/live/:sessionId', (req, res) => {
+  res.send(`<h1>Live session: ${req.params.sessionId}</h1><p>Webcam streaming goes here.</p>`);
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
