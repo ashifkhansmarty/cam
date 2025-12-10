@@ -1,0 +1,28 @@
+!DOCTYPE html
+html
+head
+titleCreate Capture Linktitle
+style
+  body { font-family Arial; padding 20px; }
+style
+head
+body
+
+h2Create Webcam Capture Linkh2
+button id=generateGenerate New Linkbutton
+
+p id=resultp
+
+script
+document.getElementById(generate).onclick = async () = {
+  let res = await fetch(apicreate);
+  let data = await res.json();
+
+  document.getElementById(result).innerHTML =
+    `strongSession IDstrong ${data.id}br
+     strongLinkstrong a href=${data.link} target=_blank${data.link}a`;
+};
+script
+
+body
+html
