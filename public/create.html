@@ -1,28 +1,17 @@
-!DOCTYPE html
-html
-head
-titleCreate Capture Linktitle
-style
-  body { font-family Arial; padding 20px; }
-style
-head
-body
+<script>
+const apicreate = '/api/create'; // Replace with your real API endpoint
 
-h2Create Webcam Capture Linkh2
-button id=generateGenerate New Linkbutton
-
-p id=resultp
-
-script
-document.getElementById(generate).onclick = async () = {
-  let res = await fetch(apicreate);
-  let data = await res.json();
-
-  document.getElementById(result).innerHTML =
-    `strongSession IDstrong ${data.id}br
-     strongLinkstrong a href=${data.link} target=_blank${data.link}a`;
+document.getElementById('generate').onclick = async () => {
+  try {
+    let res = await fetch(apicreate);
+    if (!res.ok) throw new Error('API request failed');
+    let data = await res.json();
+    document.getElementById('result').innerHTML = `
+      <strong>Session ID:</strong> ${data.id}<br>
+      <strong>Link:</strong> <a href="${data.link}" target="_blank">${data.link}</a>
+    `;
+  } catch (err) {
+    document.getElementById('result').innerHTML = `Error: ${err.message}`;
+  }
 };
-script
-
-body
-html
+</script>
