@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Webcam</title>
+</head>
+<body>
+  <h1>Live Webcam Session</h1>
+  <video id="video" width="320" height="240" autoplay></video>
+  <button id="snap">Send Snapshot to Telegram</button>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('sessionId');
+
+    const video = document.getElementById('video');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; })
+      .catch(err => alert('Error accessing webcam: ' + err));
+
+    document.getElementById('snap').onclick = async () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+
+      const imgData = canvas.toDataURL('image/png');
+
+      const res = await fetch('/api/sendPhoto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, imgData })
+      });
+
+      const result = await res.json();
+      alert(result.message);
+    };
+  </script>
+</body>
+</html>
